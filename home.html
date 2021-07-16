@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Stratus360-Michael Butto</title>
+  </head>
+  <body>
+    <h3><a href="/">Home</a></h3>
+    <div class="container">
+      <h2 id="title"></h2>
+      <p id="date"></p>
+      <p id="views"></p>
+      <div class="container">
+        
+        <div class="comic">
+          <img src="" alt="xkcd" id="xkcd" />
+          <p id="transcript"></p>
+        </div>
+        
+      </div>
+      <button class="next" onclick="next()">Next</button>
+      <button class="rand" onclick="random()" style="margin-left: 10px; margin-right: 10px;">Random</button>
+      <button class="prev" onclick="prev()">Previous</button>
+    </div>
+
+    <script>
+      if (
+        window.location.pathname === "/" ||
+        window.location.pathname === "/0"
+      ) {
+        window.location.href =
+          window.location.origin + "/" + localStorage.getItem("newest");
+      }
+      fetch("https://cors-anywhere.herokuapp.com/http://xkcd.com/info.0.json", {
+        method: "GET",
+      })
+        .then((res) => {
+          if (res.ok) {
+          } else {
+            console.log("Failure");
+          }
+
+          return res.json();
+        })
+        .then((data) => {
+          localStorage.setItem("newest", data.num);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      var pathname = window.location.pathname;
+
+      var comicNum = Number(pathname.slice(1));
+
+      if (comicNum < 1) {
+        comicNum = localStorage.getItem("newest");
+      } else if (comicNum > localStorage.getItem("newest")) {
+        comicNum = 1;
+      }
+
+      numUrl = comicNum + "/";
+
+      fetch(
+        "https://cors-anywhere.herokuapp.com/http://xkcd.com/" +
+          numUrl +
+          "info.0.json",
+        {
+          method: "GET",
+        }
+      )
+        .then((res) => {
+          if (res.ok) {
+          } else {
+            console.log("Failure");
+            console.log(res);
+          }
+
+          return res.json();
+        })
+        .then((data) => {
+          var xkcd = document.getElementById("xkcd");
+          xkcd.src = data.img;
+          xkcd.alt = data.alt;
+
+          var title = document.getElementById("title");
+          title.innerHTML = data.title;
+
+          var date = document.getElementById("date");
+          date.innerHTML = data.month + "/" + data.day + "/" + data.year;
+
+          var transcript = document.getElementById("transcript");
+          var trns = data.transcript.replace(/[[\]\/\\#,+()$~%*?<>{}]/g, "");
+          //trns = trns.replace(/[.]/g, ".\n");
+
+          transcript.innerHTML = trns;
+        })
+        .catch((error) => console.log(error));
+
+      function next() {
+        comicNum++;
+
+        window.location.href = window.location.origin + "/" + comicNum;
+      }
+
+      function prev() {
+        comicNum--;
+
+        window.location.href = window.location.origin + "/" + comicNum;
+      }
+
+      function random() {
+        comicNum = Math.floor(
+          Math.random() * Number(localStorage.getItem("newest")) + 1
+        );
+
+        window.location.href = window.location.origin + "/" + comicNum;
+      }
+
+      document.getElementById("views").innerHTML = "Views: " + "<%=views%>";
+    </script>
+  </body>
+  <style>
+    .container {
+      text-align: center;
+    }
+    .comic {
+      align-content: center;
+      display: inline-block;
+      width: min-content;
+    }
+
+    button {
+      border: none;
+      padding: 16px 32px;
+      text-align: center;
+      background-color: gray;
+      /* display: inline-block; */
+      font-size: 16px;
+      /* margin: 4px 2px; */
+      transition-duration: 0.4s;
+      cursor: pointer;
+
+      width: 150px;
+      height: 50px;
+      margin: 0 auto;
+      padding: 0;
+      display: table-cell;
+      vertical-align: middle;
+    }
+
+    .next:hover,
+    .prev:hover,
+    .rand:hover {
+      background-color: rgb(163, 163, 163) !important;
+    }
+  </style>
+</html>
