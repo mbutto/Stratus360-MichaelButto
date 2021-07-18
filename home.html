@@ -6,104 +6,58 @@
   <body>
     <h3><a href="/">Home</a></h3>
     <div class="container">
-      <h2 id="title"></h2>
-      <p id="date"></p>
-      <p id="views"></p>
+      <h2 id="title"><%=data.xkcd.title%></h2>
+      <p id="date">
+        <%=data.xkcd.year%>/<%=data.xkcd.month%>/<%=data.xkcd.day%>
+      </p>
+      <p id="views"><%=data.views%></p>
       <div class="container">
-        
         <div class="comic">
-          <img src="" alt="xkcd" id="xkcd" />
-          <p id="transcript"></p>
+          <img src="<%=data.xkcd.img%>" alt="<%=data.xkcd.alt%>" id="xkcd" />
+          <p id="transcript"><%-data.transcript%></p>
         </div>
-        
       </div>
       <button class="next" onclick="next()">Next</button>
-      <button class="rand" onclick="random()" style="margin-left: 10px; margin-right: 10px;">Random</button>
+      <button
+        class="rand"
+        onclick="random()"
+        style="margin-left: 10px; margin-right: 10px"
+      >
+        Random
+      </button>
       <button class="prev" onclick="prev()">Previous</button>
     </div>
 
     <script>
-      if (
-        window.location.pathname === "/" ||
-        window.location.pathname === "/0"
-      ) {
-        window.location.href =
-          window.location.origin + "/" + localStorage.getItem("newest");
+      if (window.location.pathname === "/0") {
+        window.location.href = window.location.origin + "/";
       }
-      fetch("https://cors-anywhere.herokuapp.com/http://xkcd.com/info.0.json", {
-        method: "GET",
-      })
-        .then((res) => {
-          if (res.ok) {
-          } else {
-            console.log("Failure");
-          }
 
-          return res.json();
-        })
-        .then((data) => {
-          localStorage.setItem("newest", data.num);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      localStorage.setItem('newest', '<%=data.newest%>')
 
       var pathname = window.location.pathname;
-
       var comicNum = Number(pathname.slice(1));
 
-      if (comicNum < 1) {
-        comicNum = localStorage.getItem("newest");
-      } else if (comicNum > localStorage.getItem("newest")) {
-        comicNum = 1;
+      if (comicNum < 1 && comicNum !='') {
+        window.location.href = window.location.origin + "/1";
+      } else if (comicNum > parseInt('<%=data.newest%>')) {
+        window.location.href = window.location.origin + "/" + parseInt('<%=data.newest%>');
       }
 
       numUrl = comicNum + "/";
 
-      fetch(
-        "https://cors-anywhere.herokuapp.com/http://xkcd.com/" +
-          numUrl +
-          "info.0.json",
-        {
-          method: "GET",
-        }
-      )
-        .then((res) => {
-          if (res.ok) {
-          } else {
-            console.log("Failure");
-            console.log(res);
-          }
-
-          return res.json();
-        })
-        .then((data) => {
-          var xkcd = document.getElementById("xkcd");
-          xkcd.src = data.img;
-          xkcd.alt = data.alt;
-
-          var title = document.getElementById("title");
-          title.innerHTML = data.title;
-
-          var date = document.getElementById("date");
-          date.innerHTML = data.month + "/" + data.day + "/" + data.year;
-
-          var transcript = document.getElementById("transcript");
-          var trns = data.transcript.replace(/[[\]\/\\#,+()$~%*?<>{}]/g, "");
-          //trns = trns.replace(/[.]/g, ".\n");
-
-          transcript.innerHTML = trns;
-        })
-        .catch((error) => console.log(error));
-
       function next() {
+        if (comicNum < parseInt('<%=data.newest%>')) {
         comicNum++;
+        }
 
         window.location.href = window.location.origin + "/" + comicNum;
       }
 
       function prev() {
+        if (comicNum > 1) {
         comicNum--;
+        }
 
         window.location.href = window.location.origin + "/" + comicNum;
       }
@@ -115,8 +69,6 @@
 
         window.location.href = window.location.origin + "/" + comicNum;
       }
-
-      document.getElementById("views").innerHTML = "Views: " + "<%=views%>";
     </script>
   </body>
   <style>
