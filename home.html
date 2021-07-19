@@ -39,8 +39,8 @@
       var comicNum = Number(pathname.slice(1));
 
       if (comicNum < 1 && comicNum !='') {
-        window.location.href = window.location.origin + "/1";
-      } else if (comicNum > parseInt('<%=data.newest%>')) {
+        window.location.href = window.location.origin + "/" + parseInt('<%=data.newest%>');
+      } else if (comicNum > parseInt('<%=data.newest%>') || comicNum == '') {
         window.location.href = window.location.origin + "/" + parseInt('<%=data.newest%>');
       }
 
@@ -49,6 +49,8 @@
       function next() {
         if (comicNum < parseInt('<%=data.newest%>')) {
         comicNum++;
+        } else {
+          comicNum = '<%=data.newest%>';
         }
 
         window.location.href = window.location.origin + "/" + comicNum;
@@ -57,6 +59,8 @@
       function prev() {
         if (comicNum > 1) {
         comicNum--;
+        } else {
+          comicNum = 1;
         }
 
         window.location.href = window.location.origin + "/" + comicNum;
